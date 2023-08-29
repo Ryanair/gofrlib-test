@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	github.com/Ryanair/gofrlib v1.0.25 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/docker/docker v24.0.5+incompatible // indirect
 	github.com/docker/go-units v0.5.0 // indirect

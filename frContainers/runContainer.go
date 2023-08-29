@@ -4,21 +4,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/docker/go-connections/nat"
-	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"time"
 )
 
-func RunLocalstack(ctx context.Context, suite suite.Suite) (testcontainers.Container, string) {
-	return RunLocalstackServices(ctx, suite, "dynamodb")
+func RunLocalstackDynamo(ctx context.Context) (testcontainers.Container, string) {
+	return RunLocalstackServices(ctx, "dynamodb")
 }
 
-func RunLocalstackSqs(ctx context.Context, suite suite.Suite) (testcontainers.Container, string) {
-	return RunLocalstackServices(ctx, suite, "sqs")
+func RunLocalstackSqs(ctx context.Context) (testcontainers.Container, string) {
+	return RunLocalstackServices(ctx, "sqs")
 }
 
-func RunLocalstackServices(ctx context.Context, suite suite.Suite, services string) (testcontainers.Container, string) {
+func RunLocalstackServices(ctx context.Context, services string) (testcontainers.Container, string) {
 	localstackPort := nat.Port("4566")
 	req := testcontainers.ContainerRequest{
 		Image:        "localstack/localstack",
@@ -28,10 +27,10 @@ func RunLocalstackServices(ctx context.Context, suite suite.Suite, services stri
 			"SERVICES": services,
 		},
 	}
-	return RunContainer(ctx, suite, req, localstackPort)
+	return RunContainer(ctx, req, localstackPort)
 }
 
-func RunContainer(ctx context.Context, suite suite.Suite, req testcontainers.ContainerRequest, mappedPort nat.Port) (testcontainers.Container, string) {
+func RunContainer(ctx context.Context, req testcontainers.ContainerRequest, mappedPort nat.Port) (testcontainers.Container, string) {
 	retries := 3
 	for i := 0; i <= retries; i++ {
 		localStackContainer, err := runContainer(ctx, req)
@@ -45,10 +44,14 @@ func RunContainer(ctx context.Context, suite suite.Suite, req testcontainers.Con
 		}
 
 		port, err := localStackContainer.MappedPort(ctx, mappedPort)
-		suite.NoError(err)
+		if err != nil {
+			panic(err)
+		}
 
 		host, err := localStackContainer.Host(ctx)
-		suite.NoError(err)
+		if err != nil {
+			panic(err)
+		}
 
 		serviceUrl := fmt.Sprintf("http://%v:%v", host, port.Port())
 
