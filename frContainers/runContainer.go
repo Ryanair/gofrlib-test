@@ -6,6 +6,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"os"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func RunLocalstackSqs(ctx context.Context) (testcontainers.Container, string) {
 func RunLocalstackServices(ctx context.Context, services string) (testcontainers.Container, string) {
 	localstackPort := nat.Port("4566")
 	req := testcontainers.ContainerRequest{
-		Image:        "localstack/localstack",
+		Image:        getLocalStackImage(),
 		ExposedPorts: []string{"4566/tcp"},
 		WaitingFor:   wait.ForListeningPort(localstackPort),
 		Env: map[string]string{
@@ -28,6 +29,14 @@ func RunLocalstackServices(ctx context.Context, services string) (testcontainers
 		},
 	}
 	return RunContainer(ctx, req, localstackPort)
+}
+
+func getLocalStackImage() string {
+	localstackImage := os.Getenv("TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX")
+	if len(localstackImage) != 0 {
+		return localstackImage
+	}
+	return "localstack/localstack"
 }
 
 func RunContainer(ctx context.Context, req testcontainers.ContainerRequest, mappedPort nat.Port) (testcontainers.Container, string) {

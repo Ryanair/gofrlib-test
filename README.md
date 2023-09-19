@@ -100,3 +100,6 @@ func (suite *HandlerIntegrationSuite) Test_TableExists() {
 	assert.Equal(suite.T(), 1, len(tables.TableNames))
 }
 ```
+
+## Customizations
+localstack images can be overriden using TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX env variable.
