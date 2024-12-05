@@ -32,7 +32,7 @@ func RunLocalstackServices(ctx context.Context, services string) (testcontainers
 }
 
 func getLocalStackImage() string {
-	localstackImage := os.Getenv("TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX")
+	localstackImage := os.Getenv("TESTCONTAINERS_HUB_IMAGE_NAME")
 	if len(localstackImage) != 0 {
 		return localstackImage
 	}

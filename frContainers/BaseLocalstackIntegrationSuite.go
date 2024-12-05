@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go"
 )
@@ -21,6 +22,12 @@ func NewBaseLocalstackIntegrationSuite(provideContainer func() (testcontainers.C
 	return BaseLocalstackIntegrationSuite{provideContainer: provideContainer}
 }
 
+// GetLocalstackConfig
+//
+//	Example use:
+//		return dynamodb.NewFromConfig(suite.BaseLocalstackIntegrationSuite.GetLocalstackConfig(), func(o *dynamodb.Options) {
+//			o.Credentials = suite.GetCredentials()
+//		})
 func (this *BaseLocalstackIntegrationSuite) GetLocalstackConfig() aws.Config {
 	cfg, err := config.LoadDefaultConfig(context.Background(), func(options *config.LoadOptions) error {
 		options.EndpointResolverWithOptions = aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
@@ -37,6 +44,14 @@ func (this *BaseLocalstackIntegrationSuite) GetLocalstackConfig() aws.Config {
 	}
 
 	return cfg
+}
+
+func (this *BaseLocalstackIntegrationSuite) GetCredentials() credentials.StaticCredentialsProvider {
+	return credentials.NewStaticCredentialsProvider("test", "test", "")
+}
+
+func (this *BaseLocalstackIntegrationSuite) GetEndpoint() string {
+	return this.awsEndpoint
 }
 
 func (this *BaseLocalstackIntegrationSuite) SetupSuite() {
